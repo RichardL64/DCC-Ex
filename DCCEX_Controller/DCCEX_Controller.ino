@@ -402,7 +402,7 @@ void sendCmd(int cmd, int p1) {
 //
 int smoothAnalog(int reading) 
 {
-  const int numSamples = 50;
+  const int numSamples = 20;
   static int samples[numSamples];
   static int sampleIndex = 0;
   static int sampleSum = 0;
