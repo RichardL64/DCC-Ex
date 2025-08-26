@@ -1,4 +1,4 @@
-# DCC-Ex
+# DCC-EX
 DCC-Ex components/customisations and all things Model Railway
 
 # Why: 
