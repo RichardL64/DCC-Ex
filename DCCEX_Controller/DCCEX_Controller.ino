@@ -4,7 +4,7 @@
 //
 //  Minimal DCC controller:
 //
-//  Analogue centre off pot input for speed
+//  Analogue centre detent pot input for speed
 //
 //  Digital buttons
 //    1. SPDT momentary - Next/Previous Loco selection from the roster
