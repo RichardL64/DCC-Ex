@@ -5,7 +5,7 @@
 //  Minimal DCC controller:
 //
 //  Analogue centre off pot input for speed
-//  Multicolour LED for status output
+//
 //  Digital buttons
 //    1. SPDT momentary - Next/Previous Loco selection from the roster
 //    2. Push momentary - Stop button
