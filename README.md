@@ -1,7 +1,7 @@
 # DCC-EX
 DCC-Ex components/customisations and all things Model Railway
 
-# Why: 
+# Why
 I was keen to keep the best of old-school 70s era (when I was using it as a kid) control with modern DCC multi loco functionality for my layout.
 
 
@@ -21,12 +21,12 @@ Its not that hard to get used to - you just rotate the controller in the directi
 Its a compromise for keeping the physical centre off detent - lots of potential here for more hints for the operator, perhaps even a haptic detent when passing the off position vs. a physical one?
 
 
-# Controller: 
+# Controller
    Wemos D1 - 1x 20k POT input for speed and direction, 1x double pole momentary switch to select locos from the roster, 1x momentary button for emergency stop.
    The controller can connect to the CS either over Wifi, or serial.
    
-# DCC-Ex:
-  Automation.h implements a command filter which watches for specific user ' <U n1 n2 n3> ' commands from the throttle to tell it which loco the throttle is controlling. (Many thanks to the DCC-Ex Discord support on how to do this!)
+# DCC-Ex
+  Automation.h implements a command filter which watches for specific user ' \<U n1 n2 n3> ' commands from the throttle to tell it which loco the throttle is controlling and some other status codes for syncing the controller position. (Many thanks to the DCC-Ex Discord support on how implement the filter!)
 
 
 This is proof of concept - next steps are a separate display on the DCC-Ex command station specifically for loco information.
