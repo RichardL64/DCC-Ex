@@ -14,7 +14,12 @@ The loco select switch chooses the next/previous loco and the central display sh
 
 
 # Challenges
-  The controller knob has positional state - so when changing to another loco in the roster it does not generate speed control until the user syncs the knob position with the loco speed. The central CS display currently shows 'Rotate <<<' 'Rotate >>>' 'Rotate to off' type messages to aid this process. Its a compromise.
+  The controller knob has positional state - so when changing to another loco in the roster it does not generate speed control until the user syncs the knob position with the loco speed. The central CS display currently shows 'Rotate <<<' 'Rotate >>>' 'Rotate to off' type messages to aid this process. 
+
+Its not that hard to get used to - you just rotate the controller in the direction on screen - when it gets to the loco's actual speed it will start to have an effect again.
+
+Its a compromise for keeping the physical centre off detent - lots of potential here for more hints for the operator, perhaps even a haptic detent when passing the off position vs. a physical one?
+
 
 # Controller: 
    Wemos D1 - 1x 20k POT input for speed and direction, 1x double pole momentary switch to select locos from the roster, 1x momentary button for emergency stop.
@@ -25,6 +30,11 @@ The loco select switch chooses the next/previous loco and the central display sh
 
 
 This is proof of concept - next steps are a separate display on the DCC-Ex command station specifically for loco information.
+
 ![alt_text](https://github.com/RichardL64/DCC-Ex/blob/main/IMG_0818.jpeg)
 
+Default DCC decoder 0003 from the roster
 ![alt_text](https://github.com/RichardL64/DCC-Ex/blob/main/IMG_0824.jpeg)
+
+Example loco roster display
+![alt_text](https://github.com/RichardL64/DCC-Ex/blob/main/IMG_0828.jpeg)
