@@ -34,7 +34,7 @@ This is proof of concept - next steps are a separate display on the DCC-Ex comma
 Wemos D1 (could be any microcontroller)
 ![alt_text](https://github.com/RichardL64/DCC-Ex/blob/main/IMG_0818.jpeg)
 
-Default DCC decoder 0003 from the roster
+Default DCC decoder 0003 from the roster, the default on new DCC chips before programming
 ![alt_text](https://github.com/RichardL64/DCC-Ex/blob/main/IMG_0824.jpeg)
 
 Example loco roster display
