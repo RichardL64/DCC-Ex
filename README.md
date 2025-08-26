@@ -23,7 +23,7 @@ Its a compromise for keeping the physical centre off detent - lots of potential 
 
 # Controller: 
    Wemos D1 - 1x 20k POT input for speed and direction, 1x double pole momentary switch to select locos from the roster, 1x momentary button for emergency stop.
-   The controller can connect to the CS either over its Wifi, or serial.
+   The controller can connect to the CS either over Wifi, or serial.
    
 # DCC-Ex:
   Automation.h implements a command filter which watches for specific user ' <U n1 n2 n3> ' commands from the throttle to tell it which loco the throttle is controlling. (Many thanks to the DCC-Ex Discord support on how to do this!)
@@ -31,6 +31,7 @@ Its a compromise for keeping the physical centre off detent - lots of potential 
 
 This is proof of concept - next steps are a separate display on the DCC-Ex command station specifically for loco information.
 
+Wemos D1 (could be any microcontroller)
 ![alt_text](https://github.com/RichardL64/DCC-Ex/blob/main/IMG_0818.jpeg)
 
 Default DCC decoder 0003 from the roster
