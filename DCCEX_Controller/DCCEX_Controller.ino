@@ -5,10 +5,9 @@
 //  Minimal DCC controller:
 //
 //  Analogue centre detent pot input for speed
-//
 //  Digital buttons
 //    1. SPDT momentary - Next/Previous Loco selection from the roster
-//    2. Push momentary - Stop button
+//    2. Push momentary - Stop button, Hold 5 seconds - re-connect
 //
 //  Wifi -or- Serial
 //
@@ -146,18 +145,21 @@ void setup() {
   #ifdef USE_WIFI
   Serial.println("Connecting to WiFi..");
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) delay(1000);
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");   
+    delay(1000);
+  }
   Serial.print("Connected with IP: ");
   Serial.println(WiFi.localIP());
 
   // Connect to the DCC-Ex server
   //
   Serial.println("Connecting to the server...");
-  if (!client.connect(serverAddress, serverPort)) {
-    Serial.println("Connection failed");
-    while (1) delay(1000);
+  while(!client.connect(serverAddress, serverPort)) {
+    Serial.print(".");   
+    delay(1000);
   }
-  Serial.println("Connected to the server");
+  Serial.println("\nConnected to the server");
 
   //  Connect DCC-Ex
   //
@@ -282,8 +284,23 @@ void loop() {
     dccex.emergencyStop();
     waitPotStop = true;                             // no more speed control until the pot is centered
     sendCmd(U_WAIT_POT_STOP);                       // tell the CS
-  }
 
+  //  Press and hold - restart/re-connect with the CS
+  //
+  } else if(button3.isPressed()){
+    unsigned int pressedFrom = millis();
+    while(button3.isPressed()) {
+      if(millis() - pressedFrom > 5000) {
+        client.stopAll();
+        if(WiFi.isConnected()) WiFi.disconnect();
+        setup();
+        break;
+      }
+      delay(10);
+    }
+
+
+  }
 
   //  Wait for the stop position
   //
