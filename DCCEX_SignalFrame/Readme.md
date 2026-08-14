@@ -1,5 +1,13 @@
 # DCCEX Controlled locking lever frame
 
+I wanted something reminiscent of a lever frame for my model railway, not a mimic board - but more a row of numbered levers.
+I also wanted some sort of interlock like the real thing to try and prevent invalid pulls and add some realism/complexity to managing the points.
+
+This is built and working, however not yet full controlling the model railway. It is entirely possible it will not be fun! If that turns out to be the case its just EXRAIL logic and can be amended.
+
+I have a contingency option of a switch elsewhere to relax the locking logic. If the bitmap pin PANEL_BYPASS is set then the levers will just operate their actions.
+
+
 # Hardware
 The signal frame uses 3x 23017s for input output.
 Each board has 
