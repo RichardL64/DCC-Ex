@@ -25,9 +25,12 @@ LED Lit = Unlocked, lever maybe moved
 
 LED off = Locked, lever is locked and should not be moved
 
-LED Flashing = lever was moved while locked, the input was ignored and the lever should be moved back
+LED Flashing = lever was moved while locked, the input was ignored and the lever should be moved back, all other inputs will be ignored until it is moved back.
 
-At startup the lever frame checks for moved levers and resets, with user help, the lever positions and all point/signal positions.
+The starting position, as in real life - is all levers in the pushed back/normal position.
+That means all signals on danger and all points in a nominal / default position.
+
+At startup the lever frame checks for moved levers and resets, with user help, the lever positions and all point/signal positions. i.e. It can resolve the situation where levers are moved with the power off, or a power cut leaves points or other control mechanisms in an unknown state.
 
 The example code is not yet portable, its my main layout station so contains specifics, alias naming etc to that station.
 
