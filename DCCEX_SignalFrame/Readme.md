@@ -103,13 +103,17 @@ If the point 2 is pulled first, signal 3 will go out - locked, and signal 1 will
 
 ![alt_text](https://github.com/RichardL64/DCC-Ex/blob/main/DCCEX_SignalFrame/IMG_1538.jpeg)
 
-This isn't as bad as it looks.. I hope.
+The wiring isn't as bad as it looks.. 
+
+I hope.
 A daisy chained spade connector cable is avaialble online - which hooks on to one side of the switches for common ground, and cut up for the other side feeding into the 23017s
+
 Switches are wired:   Ground -> Switch -> 23017 pin
 
 LED are all pre-wired off the shelf, run at 3.3v, bought as good for 6-9v (I may cut their brightness further with some diodes)
 Note leds are grounded to turn on - so SET(led_vpin) = off,  RESET(led_vpin) = on
 
 LEDS are wired: 3.3v -> LED/Inc resistor -> 23017 pin
+Potentially 3.3v -> diode -> diode > LED+Resistor -> 23017 pin (to be tested to drop the brightness)
 
 ![alt_text](https://github.com/RichardL64/DCC-Ex/blob/main/DCCEX_SignalFrame/IMG_1548.jpeg)
