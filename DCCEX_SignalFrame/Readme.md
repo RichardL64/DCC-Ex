@@ -103,4 +103,3 @@ Note leds are grounded to turn on - so SET(led_vpin) = off,  RESET(led_vpin) = o
 LEDS are wired: 3.3v -> LED/Inc resistor -> 23017 pin
 
 ![alt_text](https://github.com/RichardL64/DCC-Ex/blob/main/DCCEX_SignalFrame/IMG_1548.jpeg)
-
