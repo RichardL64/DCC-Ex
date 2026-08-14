@@ -30,16 +30,11 @@ The example code is not yet portable, its my main layout station so contains spe
 # Principle - encoding locking logic
 This allows the basic principle of locking to be encoded, e.g.
 
-//
-//	Manage locking logic
-//
 ALIAS(troyInterlock)
 SEQUENCE(troyInterlock)
 
 ... Example of signals protecting points and points locking out signals
 
-	//	Mayhill approach
-	//
 	IF_ANY(LEVER(1), LEVER(3))		// Up Mayhill outer, Down Mayhill starting
 		LOCK(2)											// Mayhill loop points
 	ELSE
@@ -56,9 +51,7 @@ SEQUENCE(troyInterlock)
 
 ... Example of a mutualy exclusive set of levers, representing routes, only one can be selected
 
-	//	Mutually exclusive goods yard routes
-	//
-	// If ANY goods lever is pulled, lock the others
+
 	IF_ANY(LEVER(20), LEVER(21), LEVER(22), LEVER(23), LEVER(24))
     IFLEVER(20) UNLOCK(20) ELSE LOCK(20) ENDIF
     IFLEVER(21) UNLOCK(21) ELSE LOCK(21) ENDIF
@@ -66,7 +59,6 @@ SEQUENCE(troyInterlock)
     IFLEVER(23) UNLOCK(23) ELSE LOCK(23) ENDIF
     IFLEVER(24) UNLOCK(24) ELSE LOCK(24) ENDIF
   ELSE
-    // No goods levers pulled -> all unlocked
     UNLOCK(20) UNLOCK(21) UNLOCK(22) UNLOCK(23) UNLOCK(24)
   ENDIF
 
@@ -75,16 +67,10 @@ Note - while each lever is deteced with an onsensor() event, the actions are all
 This is required by the autostart routine so it can reset signals and points to a known good starting position,
 Currently you cannot directly call an event from a sequence.
 
-//	Perform all actions, turnouts signals etc
-//	Only called from the event handlers if there are no faults
-//	DCC-Ex should ignore any duplicates
-//
 ALIAS(troyActions)
 SEQUENCE(troyActions)
 	PRINT("Actions")
 
-	//	Mayhill approach
-	//
 	IFLEVER(1)
 	ENDIF
 
@@ -117,3 +103,4 @@ Note leds are grounded to turn on - so SET(led_vpin) = off,  RESET(led_vpin) = o
 LEDS are wired: 3.3v -> LED/Inc resistor -> 23017 pin
 
 ![alt_text](https://github.com/RichardL64/DCC-Ex/blob/main/DCCEX_SignalFrame/IMG_1548.jpeg)
+
