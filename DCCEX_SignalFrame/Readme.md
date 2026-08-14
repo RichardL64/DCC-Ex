@@ -7,6 +7,8 @@ This is built and working, however not yet full controlling the model railway. I
 
 I have a contingency option of a switch elsewhere to relax the locking logic. If the bitmap pin PANEL_BYPASS is set then the levers will just operate their actions.
 
+I believe sequences are limited to 255 in EXRAIL, this approach uses 3 no matter how many switches are controlled.
+
 
 # Hardware
 The signal frame uses 3x 23017s for input output.
@@ -66,6 +68,9 @@ SEQUENCE(troyInterlock)
 Note - while each lever is deteced with an onsensor() event, the actions are all run from a single sequence.
 This is required by the autostart routine so it can reset signals and points to a known good starting position,
 Currently you cannot directly call an event from a sequence.
+
+I have not tested, but understand DCC-EX will suppress the same message to the same vpin, so even though this is called for every valid lever pull it should not make point/signal motors/servos chatter.
+
 
 ALIAS(troyActions)
 SEQUENCE(troyActions)
