@@ -21,3 +21,4 @@ Various modes:
 https://github.com/RichardL64/DCC-Ex/blob/main/DCCEX_Throttle/IMG_1570.jpeg
 https://github.com/RichardL64/DCC-Ex/blob/main/DCCEX_Throttle/IMG_1595.jpeg
 https://github.com/RichardL64/DCC-Ex/blob/main/DCCEX_Throttle/IMG_1596.jpeg
+https://github.com/RichardL64/DCC-Ex/blob/main/DCCEX_Throttle/Screenshot%202026-08-18%20at%2020.17.36.jpg
