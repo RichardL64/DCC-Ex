@@ -1,8 +1,12 @@
 # DCC Throttle
 
-Work in progress
 ESP32 C3 Screen/Rotary/Button module
 DCC-Ex throttle controller - talking to DCC-Ex with native <...> commands
+
+Functional, drive, roster, address & terminal.
+
+Settings currently hard coded - Work in progres.
+
 
 # Control scheme
 Rotary - choose/speed
