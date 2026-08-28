@@ -50,7 +50,7 @@ Based on Petscii alpha shifted to ASCII locations
 Screen.h supports fg/bg colours at a character level, so no need for reverse in the font itself
 
 The bottom row $F0-$FF used for block/large character output
-![alt_text](https://github.com/RichardL64/DCC-Ex/blob/main/DCCEX_Throttle/Screenshot%202026-08-18%20at%2020.17.36.jpg)
+![alt_text](https://github.com/RichardL64/DCC-Ex/blob/main/DCCEX_Throttle/Fonts%20and%20Sprites/petscii_ascii_mk2.pf.jpg)
 
 # Wiring
 ![alt_text](https://github.com/RichardL64/DCC-Ex/blob/main/DCCEX_Throttle/IMG_1595.jpeg)
