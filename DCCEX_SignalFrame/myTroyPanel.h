@@ -110,7 +110,7 @@ HAL(Bitmap, 	PANEL_BYPASS,	1)								// Bypass interlock
 //
 #define FAULT0								PANEL_FAULTS
 
-//	Note - led blink redundant here - the interlock sequence also does it
+//	Note - led blink may be redundant here - the interlock sequence also does it
 #define FAULT(lever)					SET(PANEL_FAULTS +lever)		LED_BLINK(lever, 100, 250)
 #define IFFAULT(lever)				IF(PANEL_FAULTS +lever)
 #define IFNOTFAULT(lever)			IFNOT(PANEL_FAULTS +lever)
@@ -288,9 +288,9 @@ SEQUENCE(troyInterlock)
 
 	//	Mayhill approach up/down and down starters must all be normal
 	IF_ALL(LEVER(1), LEVER(2), LEVER(3), LEVER(5), LEVER(11))
-		UNLOCK(19)
-	ELSE
 		LOCK(19)
+	ELSE
+		UNLOCK(19)
 	ENDIF
 
 	//	Mutually exclusive goods yard routes
