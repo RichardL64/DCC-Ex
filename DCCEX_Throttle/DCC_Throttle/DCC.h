@@ -123,8 +123,6 @@ private:
       const unsigned long maxTimeout = 3000;        // Hard safety net (3 seconds max)
       const unsigned long silenceDelay = 500;       // Wait 500ms after the last packet
 
-      // Keep track of the last known timestamp from the cache
-
       while (millis() - start < maxTimeout) {
           Comms.tick();                             // Keep wifi up
           tick();                                   // Keep processing inbound messages
@@ -197,7 +195,6 @@ public:
   //
   void requestRoster() {
     if (!Comms.dccConnected()) return;                  // -->
-
     Comms.dccPrintf("<JR>");
   }
 
@@ -259,7 +256,6 @@ public:
         sentLoco = setLoco;
         sentSpeed = setSpeed;
         sentForward = setForward;
-        LOG("Sent speed %d %d", sentLoco, sentSpeed);
     }
 
   }

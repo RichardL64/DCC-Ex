@@ -75,33 +75,12 @@ private:
   }
 
 
-  // Derive default DCC-EX AP password if SSID follows "DCCEX_xxxxxx"
-  //
-  void derivePassword(const char* ssid, char* password, size_t maxLen) {
-    if (strncmp(ssid, "DCCEX_", 6) != 0) return;        // --> Not on DCC AP
-
-    snprintf(password, maxLen, "PASS_%s", ssid + 6);
-  }
-
-
-  // Derive DCC IP from Wi-Fi Gateway if connected directly to a DCC-EX AP
-  //
-  void deriveIP(const char* ssid, char* ip, size_t maxLen) {
-    if (strncmp(ssid, "DCCEX_", 6) != 0) return;        // --> Not on DCC AP
-
-    IPAddress gw = WiFi.gatewayIP();
-    if (gw != IPAddress(0, 0, 0, 0)) {
-      snprintf(ip, maxLen, "%u.%u.%u.%u", gw[0], gw[1], gw[2], gw[3]);
-    }
-  }
-
-
   //  Raw Wi-Fi connection handler
   //  Blocks while waiting for a connection
   //
   bool connectWiFi(const char* ssid, const char* password) {
 
-    scr.status("\x06" "Starting");
+    scr.status("\xdf\x20\x06" " Starting");
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();                                  // make sure the old connection is fully down
     delay(100);
@@ -149,25 +128,47 @@ public:
     connectDCC(savedIP, savedPort);
   }
 
+
   //  Share current saved settings
   //
-  const char* getSSID() {
-    return savedSSID;
+  void getSSID(char* dest, size_t maxLen) {
+    snprintf(dest, maxLen, "%s", savedSSID);
   }
-  const char* getPassword() {
-    return savedPassword;
+  void getPassword(char* dest, size_t maxLen) {
+    snprintf(dest, maxLen, "%s", savedPassword);
   }
-  const char* getIP() {
-    return savedIP;
+  void getServer(char* dest, size_t maxLen) {
+    snprintf(dest, maxLen, "%s", savedIP);
   }
-  const int getPort() {
+  int getPort() {
     return savedPort;
+  }
+
+
+  // Derive default DCC-EX AP password if SSID follows "DCCEX_xxxxxx"
+  //
+  void derivePassword(const char* ssid, char* password, size_t maxLen) {
+    if (strncmp(ssid, "DCCEX_", 6) != 0) return;        // --> Not on DCC AP
+
+    snprintf(password, maxLen, "PASS_%s", ssid + 6);
+  }
+
+
+  // Derive DCC IP from Wi-Fi Gateway if connected directly to a DCC-EX AP
+  //
+  void deriveIP(const char* ssid, char* ip, size_t maxLen) {
+    if (strncmp(ssid, "DCCEX_", 6) != 0) return;        // --> Not on DCC AP
+
+    IPAddress gw = WiFi.gatewayIP();
+    if (gw != IPAddress(0, 0, 0, 0)) {
+      snprintf(ip, maxLen, "%u.%u.%u.%u", gw[0], gw[1], gw[2], gw[3]);
+    }
   }
 
 
   // Wi-Fi Scanning
   //
-  int startWifiScan() {
+  int startSSIDScan() {
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
     delay(100);
@@ -175,15 +176,12 @@ public:
     return foundNetworksCount;
   }
 
-  int getNetworkCount() const { return foundNetworksCount; }
+  int getSSIDCount() const { return foundNetworksCount; }
 
-
-  // Zero-heap SSID lookup from scan results
-  //
-  void getScannedSSID(int index, char* dest, size_t maxLen) {
+  void getSSID(int index, char* dest, size_t maxLen) {
     if (index >= 0 && index < foundNetworksCount) {
       snprintf(dest, maxLen, "%s", WiFi.SSID(index).c_str());
-      return;
+      return;                                                 // -->
     }
     dest[0] = '\0';
   }

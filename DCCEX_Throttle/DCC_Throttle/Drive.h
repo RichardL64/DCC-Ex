@@ -63,16 +63,15 @@ private:
 
     //  Speed %
     updateUISpeed();
+    updateUIBar();
+
 
     //  Speed bar
     scr.fg(c64::Black);
-    scr.at(0, 12, "\x98\xcb\xcb\xcb\xcb\xcb\xcb\x99\xcb\xcb\xcb\xcb\xcb\xcb\x9a}");
-    scr.at(0, 13, "\xc4\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\xc4}");
-    scr.at(0, 14, "\xb8\xcb\xcb\xcb\xcb\xcb\xcb\xb9\xcb\xcb\xcb\xcb\xcb\xcb\xba}");
-
-//    scr.at(0, 12, {0x98, 0xcb, 0xcb, 0xcb, 0xcb, 0xcb, 0xcb, 0x99, 0xcb, 0xcb, 0xcb, 0xcb, 0xcb, 0xcb, 0x9a});
-//    scr.at(0, 13, {0xc4, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0xc4});
-//    scr.at(0, 14, {0xb8, 0xcb, 0xcb, 0xcb, 0xcb, 0xcb, 0xcb, 0xb9, 0xcb, 0xcb, 0xcb, 0xcb, 0xcb, 0xcb, 0xba});
+    scr.at(0, 13, "\x98\xcb\xcb\xcb\xcb\xcb\xcb\x99\xcb\xcb\xcb\xcb\xcb\xcb\x9a}");
+    scr.at(0, 14, "\xc4\x20\x20\x20\x20\x20\x20\xc4\x20\x20\x20\x20\x20\x20\xc4}");
+    scr.at(0, 15, "\xc4\x20\x20\x20\x20\x20\x20\xc4\x20\x20\x20\x20\x20\x20\xc4}");
+    scr.at(0, 16, "\xb8\xcb\xcb\xcb\xcb\xcb\xcb\xb9\xcb\xcb\xcb\xcb\xcb\xcb\xba}");
 
     scr.fg(c64::Light_blue);
   }
@@ -90,6 +89,54 @@ private:
     scr.at(12, 8, "%", c);
   }
 
+  //  Stop - $c4
+  //  Forward - 4 pixels $db, 6 full chars $ff
+  //  Reverse - 5 pixels $d5, 6 full chars $ff
+  void updateUIBar() {
+    char barBuffer[14];
+    memset(barBuffer, 0xf0, 13);          // Init to empty string
+    barBuffer[13] = '\0';
+
+    
+    //  No throttle
+    if(targetThrottle == 0) {             // Zero - just draw the vertical black bar
+        barBuffer[6] = '\xc4';            // Stop
+        scr.at(1, 14, barBuffer, c64::Black);     // Draw empty
+        scr.at(1, 15, barBuffer, c64::Black);
+        return;                           // -->
+    }
+
+    //  6 chars left or right, minus the 4/5 fixed central pixels
+    //  Its actually 5 pixels fixed left - will assume 4 for both directions
+    int pixels = map(targetThrottle, 0, 100, 0, 6*8);
+    int fullBlocks = pixels / 8;
+    int partBlocks = pixels % 8;
+
+    //  Forward centre to the right
+    if(isForward) {
+      barBuffer[6] = '\xdb';                      // Forward (4 pixels)
+      memset(&barBuffer[7], '\xff', fullBlocks);
+
+      if(partBlocks) {
+        char partChar = 0xd0 + partBlocks;        // $d1-d7 = fill cols 1-7 left to right
+        barBuffer[fullBlocks +7] = partChar;      // On the right hand end
+      }
+
+    //  Revese centre to the left
+    } else {
+      barBuffer[6] = '\xd5';                      // Reverse (5 pixels)
+      memset(&barBuffer[6 -fullBlocks], '\xff', fullBlocks);
+
+      if(partBlocks) {
+        char partChar = 0xD8 +7 -partBlocks;      // $de-d8 = fill cols 1-7 right to left
+        barBuffer[6 -fullBlocks -1] = partChar;   // On the left hand end
+      }
+    }
+
+    c64 c = isForward ? c64::Green : c64::Yellow;
+    scr.at(1, 14, barBuffer, c);                  // Draw it
+    scr.at(1, 15, barBuffer, c);
+  }
 
 public:
 
@@ -104,7 +151,6 @@ public:
   //  Switch to a specific loco
   //
   void switchTo(int locoId) {
-    LOG("Drive switch to %d", locoId);
     if(locoId != activeLocoId) {                // ? changed loco
       activeLocoId = locoId;
       saveLastLocoId(activeLocoId);             // Save for the next session
@@ -116,7 +162,6 @@ public:
   //  Sync telemetry from the Loco cache
   //
   void switchTo() {
-    LOG("Drive switch to()");
     LocoInfo* info = LocoCache.getSlotByLocoId(activeLocoId);      
     isForward      = info->forward;
     targetThrottle = info->percentSpeed;
@@ -133,6 +178,7 @@ public:
     if (targetThrottle < 0)   targetThrottle = 0;
 
     updateUISpeed();                                              // Draw it
+    updateUIBar();
     DCC.sendSpeed(activeLocoId, targetThrottle, isForward);       // Send it
   }
 
@@ -144,6 +190,7 @@ public:
     isForward = !isForward;
 
     updateUISpeed();                                              // Draw it
+    updateUIBar();
     DCC.sendSpeed(activeLocoId, targetThrottle, isForward);       // Send it
     return false;                                                 // stay on this screen
   } 

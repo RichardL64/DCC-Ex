@@ -17,6 +17,24 @@ class settingsClass {
 
 private:
 
+  //  Legal characters
+  static constexpr const char* numberList12 = "012";
+  static constexpr const char* numberList   = "0123456789";
+
+  static constexpr const char* alphaList    = " !#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~" "\x0a";
+  static constexpr const char* alphaListS   = "!#$%&\'()*+,-./:;<=>?@[\]^_`{|}~"      "\xd0\x0a";
+  static constexpr const char* alphaListU   = "0123456789 ABCDEFGHIJKLMNOPQRSTUVWXYZ" "\xd0\x0a";
+  static constexpr const char* alphaListL   = "0123456789 abcdefghijklmnopqrstuvwxyz" "\xd0\x0a";
+
+  enum Focus {SELECT, EDIT } currentFocus;
+  enum Fields {NETWORK_LIST, NETWORK_SCAN, PASSWORD, PASSWORD_AUTO, SERVER, SERVER_AUTO, COUNT } currentField;
+  int currentChar;
+
+  int selectedSSID;                       // 0-7
+  char activePassword[65];
+  char activeServer[16];                  // 123.456.789.ABC
+  char activePort[4];                     // 1234
+
 
   //  Draw the UI
   //
@@ -24,145 +42,167 @@ private:
       scr.fb(c64::White, c64::Grey);
       scr.cls("Settings");
 
-      // TBC - special char alignment in the charset  underscores
-
-      scr.at(0, 2, "Network", scr.bg(), scr.fg());
-      scr.at(0, 3, Comms.getSSID());
-
-      scr.at(0, 11, "Password", scr.bg(), scr.fg());
-      scr.at(0, 12, Comms.getPassword());
-
-      scr.at(0, 14, "Server", scr.bg(), scr.fg());
-      scr.at(0, 15, Comms.getIP());
-      scr.at(0, 16, "%d", Comms.getPort());
+      updateUI();
   }
+
+  //  The parts that change
+  //
+  void updateUI() {
+      scr.inverseIf(currentField == NETWORK_LIST);
+      scr.at(0, 2, "Network");
+      scr.inverseIf(currentField == NETWORK_SCAN);
+      scr.at(11, 2, "Scan");
+
+      scr.normal();
+      char ssid[65];                                      // SSID list
+      for(int i = 0; i<Comms.getSSIDCount(); i++) {
+        Comms.getSSID(i, ssid, sizeof(ssid));
+        scr.at(0, 3 +i, ssid);
+      }
+
+      scr.inverseIf(currentField == PASSWORD);
+      scr.at(0, 12, "Password");
+      scr.inverseIf(currentField == PASSWORD_AUTO);
+      scr.at(11, 12, "Auto");
+
+      scr.normal();
+      char pass[65];
+      snprintf(pass, sizeof(pass), "%-15.15s", activePassword);
+      scr.atEdit(0, 13, pass, currentPasswordChar);
+
+      scr.inverseIf(currentField == SERVER);
+      scr.at(0, 15, "Server");
+      scr.inverseIf(currentField == SERVER_AUTO);
+      scr.at(11, 15, "Auto");
+
+      scr.normal();
+      scr.at(0, 16, activeServer);
+      scr.at(0, 17, "%d", activePort);
+  }
+
+
+  //  Edit the last char in the buffer 
+  //  Chars selected from the passed list
+  //
+  void editBuffer(char* buffer, int maxLen, const char* charSet, int step) {
+      int charSetLen = strlen(charSet);
+
+      // If the buffer is empty and we are starting fresh, initialize with the first char
+      int currentLen = strlen(buffer);
+      if (currentLen == 0 && maxLen > 0) {
+          buffer[0] = charSet[0];
+          buffer[1] = '\0';
+          charIndex = 0;
+          return;
+      }
+
+      // Find current character in the charset and shift by step with wrap-around
+      int charIndex = strlen(buffer) -1;
+      const char* found = strchr(charSet, buffer[charIndex]);         // address of the char in the charset
+      int currentIndex = found ? (found - charSet) : 0;               // address to index
+      currentIndex = (currentIndex + step + charSetLen) % charSetLen;
+
+      buffer[charIndex] = charSet[currentIndex];
+  }
+
 
 public:
 
-  void init() {
 
+  void init() {
+    Comms.getPassword(activePassword, sizeof(activePassword));
   }
 
   void switchTo() {
+    currentFocus = SELECT;
+    currentField = NETWORK_LIST;
+    currentChar = -1;                           // Stop chars being hilighted
     drawUI();
   }
 
+  //  Step through fields, 
+  //  When selected step through options
+  //
   void handleEncoder(int step) {
 
+    // Axis 1: Select fields
+    if (currentFocus == SELECT) {
+        int newField = static_cast<int>(currentField) + step;
+        if (newField >= COUNT) newField = COUNT - 1;
+        if (newField < 0) newField = 0;
+        currentField = static_cast<Fields>(newField);
+    } 
+
+    // Axis 2: We are locked inside a field. Select field values/chars 
+    else {
+        switch(currentField) {
+        case NETWORK_LIST:
+          // Scroll through available Wi-Fi networks instead of changing menu fields
+//                  scrollNetworkList(step); 
+          break;
+
+        case PASSWORD:
+          editBuffer(activePassword, sizeof(activePassword), alphaList, step);
+          break;
+
+        default:
+          break;
+        }
+    }
+
+    updateUI();
   }
 
+
+  //  Select a field to edit,
+  //  Select a char in an edit field - until enter or field complete
+  //
   bool handleEncoderButton() {
-    LOG("Settings - connect");
-    Comms.connectTo("DCCEX_a60e20", "PASS_a60e20", "192.168.4.1", 2560);
 
-    LOG("Settings - request roster");
-    DCC.requestRoster();
+    //  Select a field to edit
+    //
+    if(currentFocus == SELECT) {
+      currentFocus = EDIT;
+      currentChar = 0;
+      return false;                                       // -->
+    }
 
-    LOG("Done");
+    //  Edit a field
+    //
+    switch(currentField) {
+      //NETWORK_LIST, NETWORK_SCAN, PASSWORD, PASSWORD_AUTO, SERVER, SERVER_AUTO,
+
+      case NETWORK_SCAN:
+        scr.status("\xdf" " Scanning");
+        Comms.startSSIDScan();
+        updateUI();
+        scr.status();
+        break;
+
+      case PASSWORD:
+        if(activePassword[currentChar] == '\x0a') {       // Enter => edit complete
+          currentChar = -1;
+          currentFocus = SELECT;
+          return false;                                   // -->
+        }
+        currentChar++;                                    // Any other char, move to the next one
+        //   check for max field length
+
+      case PASSWORD_AUTO:
+//        Comms.derivePassword(Comms.getSSID(), activePassword, sizeof(activePassword));
+        updateUI();
+        break;
+
+      case SERVER_AUTO:
+//        Comms.deriveIP(activeSSID, activeServer, sizeof(activeServer));      
+        break;
+
+      default:
+        break;
+    }
     return false;                                       // --> stay on this screen
   }
 
 
 } inline Settings;
 
-/*
-enum SettingsUXState {
-  UX_SETTINGS_MENU,     // Main settings menu (Wi-Fi, Info, etc.)
-  UX_SCANNING_WIFI,     // "Scanning..." screen
-  UX_SELECT_WIFI,       // Scanned AP list menu
-  UX_CONNECTING_WIFI,   // Connection in progress spinner
-  UX_CONNECTED_SUCCESS  // Confirmation screen
-};
-
-SettingsUXState currentSettingsUX = UX_SELECT_WIFI;
-int selectedNetworkIndex = 0;
-
-// Render Settings Page UI
-void drawSettingsUI() {
-  tft.fillScreen(CONTRAST_BG);
-  tft.setTextDatum(textdatum_t::top_left);
-
-  // Header Bar
-  tft.setTextColor(TFT_WHITE, CONTRAST_BG);
-  tft.setFont(&fonts::FreeSansBold9pt7b);
-  tft.drawString("SETTINGS", 15, 5);
-  tft.drawFastHLine(15, 30, 210, TRACK_ACCENT);
-
-  if (currentSettingsUX == UX_SCANNING_WIFI) {
-    tft.setTextColor(TFT_YELLOW, CONTRAST_BG);
-    tft.drawString("Scanning Wi-Fi APs...", 15, 60);
-  } 
-  else if (currentSettingsUX == UX_SELECT_WIFI) {
-    tft.setFont(&fonts::FreeSans9pt7b);
-    tft.setTextColor(TFT_WHITE, CONTRAST_BG);
-    tft.drawString("Select DCC-EX AP:", 15, 42);
-
-    int maxDisplay = min(foundNetworksCount, 5);
-    for (int i = 0; i < maxDisplay; i++) {
-      int yPos = 68 + (i * 26);
-      String ssid = getScannedSSID(i);
-
-      if (i == selectedNetworkIndex) {
-        // Highlighted item
-        tft.fillRect(15, yPos - 2, 210, 22, TRACK_ACCENT);
-        tft.setTextColor(CONTRAST_BG, TRACK_ACCENT);
-      } else {
-        tft.setTextColor(TFT_WHITE, CONTRAST_BG);
-      }
-
-      tft.drawString(ssid, 20, yPos);
-    }
-  }
-  else if (currentSettingsUX == UX_CONNECTING_WIFI) {
-    tft.setTextColor(TFT_CYAN, CONTRAST_BG);
-    tft.drawString("Connecting & Locking...", 15, 70);
-  }
-  else if (currentSettingsUX == UX_CONNECTED_SUCCESS) {
-    tft.setTextColor(SIGNAL_GREEN, CONTRAST_BG);
-    tft.drawString("Network Saved!", 15, 60);
-    tft.setTextColor(TFT_WHITE, CONTRAST_BG);
-    tft.drawString("SSID: " + savedSSID, 15, 90);
-    tft.drawString("IP:   " + savedIP,   15, 110);
-  }
-}
-
-// Handle Rotary Encoder Navigation for Settings Mode
-void handleSettingsEncoder(int delta, bool buttonPressed) {
-  if (currentSettingsUX == UX_SELECT_WIFI) {
-    // Scroll list
-    if (delta != 0 && foundNetworksCount > 0) {
-      selectedNetworkIndex += delta;
-      if (selectedNetworkIndex < 0) selectedNetworkIndex = 0;
-      if (selectedNetworkIndex >= foundNetworksCount) selectedNetworkIndex = foundNetworksCount - 1;
-      drawSettingsUI();
-    }
-
-    // Select AP
-    if (buttonPressed && foundNetworksCount > 0) {
-      String chosen = getScannedSSID(selectedNetworkIndex);
-
-      currentSettingsUX = UX_CONNECTING_WIFI;
-      drawSettingsUI();
-
-      // Delegate hardware action to dcc_comms
-      bool ok = connectAndSaveNetwork(chosen);
-
-      if (ok) {
-        currentSettingsUX = UX_CONNECTED_SUCCESS;
-      } else {
-        // Failed -> Rescan
-        currentSettingsUX = UX_SCANNING_WIFI;
-        drawSettingsUI();
-        startWifiScan();
-        currentSettingsUX = UX_SELECT_WIFI;
-      }
-      drawSettingsUI();
-    }
-  }
-  else if (currentSettingsUX == UX_CONNECTED_SUCCESS && buttonPressed) {
-    // Exit settings back to Drive Mode
-    currentMode = MODE_DRIVE;
-    drawDriveBackground();
-  }
-}
-*/

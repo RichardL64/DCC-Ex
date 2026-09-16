@@ -299,7 +299,7 @@ public:
         status(footer);
     };
 
-    void status(char* footer) {
+    void status(char* footer = "") {
         char buffer[COLS +1];
 
         if (footer == nullptr || footer[0] == '\0') {
@@ -385,7 +385,7 @@ public:
 
     void at(int col, int row, const char* text, c64 fg, c64 bg) {
         int len = strlen(text);
-        if (len == 0) return;
+        if (len == 0) return;                                               // -->
         if (col + len > COLS) len = COLS - col; 
 
         for (int i = 0; i < len; i++) {
@@ -399,6 +399,35 @@ public:
         int screenY = row * CHAR_H;      
         _rowSprite[len]->pushSprite(screenX, screenY);                      // Sprite to the screen
     }
+
+
+    //  editIndex is displayed in inverse, useful for editing fields
+    //
+    void atEdit(int col, int row, const char* text, int editIndex) {
+        int len = strlen(text);
+        if (len == 0) return;                                               // -->
+        if (col + len > COLS) len = COLS - col; 
+
+        for (int i = 0; i < len; i++) {
+            int charX = i * CHAR_W; 
+            if(i == editIndex) {
+                drawChar(_rowSprite[len], text[i], charX, 0, currentBg, currentFg);
+            } else {
+                drawChar(_rowSprite[len], text[i], charX, 0, currentFg, currentBg);
+            }
+
+        }
+      
+        drawScanlines(_rowSprite[len]);                                     // Scanlines overlay
+
+        int screenX = col * CHAR_W;
+        int screenY = row * CHAR_H;      
+        _rowSprite[len]->pushSprite(screenX, screenY);                      // Sprite to the screen
+    }
+
+
+
+
 
     // Variadic printf version (Forces AT LEAST ONE extra argument after the format string)
     // e.g.

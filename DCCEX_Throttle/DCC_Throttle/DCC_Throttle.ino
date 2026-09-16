@@ -65,18 +65,16 @@ void setup() {
   
 //  scr.at(11,0, "12", c64::White, c64::Green);               // Track 1 & 2 power
 //  scr.at(13,0, "P", c64::White, c64::Red);                  // Programming track
-//  scr.at(14,0, {0x06}, c64::White, c64::Green);             // Wifi char
 
   LOG("Initialising modules");
 
   Terminal.init();                                          // First so I can log to it
-  scr.status("\xdf" "WiFi");
+  scr.status("\xdf" " WiFi");
   Comms.init();                                             // Reconnect to the CS
-  scr.status("\xdf" "Roster");
+  scr.status("\xdf" " Roster");
   DCC.init();                                               // Start syncing loco information
   Drive.init();                                             // Load the last driven loco
   
-  LOG("Switching to drive");
   currentMode = MODE_DRIVE;                                 // Start in drive mode
   Drive.switchTo();
 
@@ -90,7 +88,7 @@ void loop() {
   //  --- REGULAR UPDATES ---
   //
   Comms.tick();                                             // Let comms regularly check state
-  DCC.tick();                                               // Monitor the dcc stream
+  DCC.tick();                                               // Monitor/consume the dcc stream
 
 
   //  --- ROTARY ENCODER READ ---
@@ -163,8 +161,7 @@ void loop() {
       case MODE_TERMINAL:
         Terminal.handleEncoderButton();
         break;
-
-      }
+    }
   }
   lastSelectBtnState = selectBtnRead;
 
@@ -205,7 +202,6 @@ void loop() {
       default:
         currentMode = MODE_DRIVE;
         Drive.switchTo();
-
     }
 
   }
